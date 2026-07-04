@@ -54,7 +54,6 @@
       justify-content: center;
       align-items: center;
       box-sizing: border-box;
-      /* Nudged padding slightly upward to clear bottom mobile sheets */
       padding: 10px 20px 45px 20px;
       z-index: 2;
       background: #ffffff;
@@ -64,7 +63,6 @@
     /* Immersive Invitation Canvas */
     .hero-image {
       max-width: 100%;
-      /* Scaled down to 82vh to completely clear bottom phone toolbars safely */
       max-height: 82vh;
       object-fit: contain;
       box-shadow: 0 12px 40px rgba(0,0,0,0.06);
@@ -123,7 +121,7 @@
     /* Responsive overrides for smaller phone viewports */
     @media (max-width: 480px) {
       .hero-section {
-        padding-bottom: 60px; /* Extra clearance for mobile bottom navigation overlays */
+        padding-bottom: 60px;
       }
       .fancy-reminder {
         bottom: 20px;
@@ -305,10 +303,12 @@
 <body>
   <div id="sparkles"></div>
 
+  <!-- Smooth Non-shifting Scroll Track -->
   <div class="scroll-track">
     <div class="hero-section" id="heroSection">
       <img id="heroImage" class="hero-image" src="https://lh3.googleusercontent.com/d/12GORHXtWUM79iIqx1wS8gQU2lj7OdG2X" alt="Mia's Quinceañera Invitation">
       
+      <!-- Safe, corner-anchored subtle reminder -->
       <div class="fancy-reminder" id="scrollReminder">
         <span>Keep Scrolling for RSVP</span>
         <div class="arrow">▼</div>
@@ -316,6 +316,7 @@
     </div>
   </div>
 
+  <!-- RSVP Form Section -->
   <div class="rsvp-container" id="rsvp">
     <div class="card">
       <h1>Mia's Quinceañera RSVP</h1>
@@ -346,6 +347,7 @@
     </div>
   </div>
 
+  <!-- Zero-Jitter Zoom Engine + Dynamic Opacity Controller -->
   <script>
     const heroImage = document.getElementById("heroImage");
     const scrollReminder = document.getElementById("scrollReminder");
@@ -362,10 +364,9 @@
       const scaleValue = 1 + (progress * 0.60);
       heroImage.style.transform = `scale(${scaleValue}) translateZ(0)`;
 
-      // Fades the reminder badge out smoothly as the user starts making deep progress down the page
+      // Fades the reminder badge out smoothly as the user starts making progress down the page
       if (progress > 0.4) {
         scrollReminder.style.opacity = "0";
-        // Handles proper cross-device fallback positioning animation dynamically
         if (window.innerWidth <= 480) {
           scrollReminder.style.transform = "translateX(50%) translateY(10px)";
         } else {
@@ -407,8 +408,9 @@
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
+    // Fixed Escape Syntax to Restore Complete Dropdown Functionality
     function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, m => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[m]));
+      return String(str).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
     }
 
     function renderGuestFields(max) {
