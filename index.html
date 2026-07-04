@@ -35,39 +35,42 @@
       overflow-x: hidden;
     }
 
-    /* Long track layout allows a long, dramatic zoom window */
+    /* Fixed track height prevents layout shifting vibration */
     .scroll-track {
       position: relative;
-      height: 320vh; 
+      height: 250vh; 
+      background: #ffffff;
     }
 
-    /* Hero Viewport Container */
+    /* Hero view container pins perfectly without sticky jitter */
     .hero-section {
-      position: sticky;
+      position: fixed;
       top: 0;
-      /* Dynamic height allocation handled via JS to prevent cutting off text */
-      min-height: 100vh;
+      left: 0;
+      height: 100vh;
       width: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       box-sizing: border-box;
-      padding: 40px 20px;
+      padding: 20px;
       z-index: 2;
       background: #ffffff;
+      overflow: hidden;
     }
 
     /* Immersive Invitation Canvas */
     .hero-image {
       max-width: 100%;
-      max-height: 90vh;
+      max-height: 95vh;
       object-fit: contain;
       box-shadow: 0 12px 40px rgba(0,0,0,0.06);
       border-radius: 6px;
       transform-origin: center center;
-      transition: transform 0.05s ease-out;
+      /* Hardware acceleration flags to prevent paint stuttering */
       will-change: transform;
+      transform: scale(1) translateZ(0);
     }
 
     .scroll-arrow {
@@ -79,7 +82,7 @@
       text-decoration: none;
       letter-spacing: 1px;
       animation: bounce 2s infinite;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.2s ease;
       z-index: 5;
     }
 
@@ -89,7 +92,7 @@
       60% { transform: translateY(-4px); }
     }
 
-    /* RSVP Section Container */
+    /* RSVP Section Container sits on top and moves over the fixed hero cleanly */
     .rsvp-container {
       position: relative;
       display: flex;
@@ -256,6 +259,7 @@
 <body>
   <div id="sparkles"></div>
 
+  <!-- Smooth Non-shifting Scroll Track Track -->
   <div class="scroll-track">
     <div class="hero-section" id="heroSection">
       <img id="heroImage" class="hero-image" src="https://lh3.googleusercontent.com/d/12GORHXtWUM79iIqx1wS8gQU2lj7OdG2X" alt="Mia's Quinceañera Invitation">
@@ -263,6 +267,7 @@
     </div>
   </div>
 
+  <!-- RSVP Form Section -->
   <div class="rsvp-container" id="rsvp">
     <div class="card">
       <h1>Mia's Quinceañera RSVP</h1>
@@ -293,41 +298,44 @@
     </div>
   </div>
 
+  <!-- Zero-Jitter High-Performance Engine -->
   <script>
     const heroSection = document.getElementById("heroSection");
     const heroImage = document.getElementById("heroImage");
     const scrollArrow = document.getElementById("scrollArrow");
 
-    window.addEventListener("scroll", () => {
+    // requestAnimationFrame debounces scrolling overhead perfectly
+    let ticking = false;
+
+    function updateZoom() {
       const scrollPosition = window.scrollY;
       
-      // Control zoom window size
-      const maxScrollDistance = window.innerHeight * 1.5;
+      // Calculate progress cleanly off a single non-changing number
+      const maxScrollDistance = window.innerHeight * 1.3;
       const progress = Math.min(scrollPosition / maxScrollDistance, 1);
 
-      // Deep Zoom: 1.6x sizing
+      // Deep zoom up to 1.6x layout size
       const scaleValue = 1 + (progress * 0.60);
-      heroImage.style.transform = `scale(${scaleValue})`;
+      
+      // Render transform utilizing 3D matrix pass-through to ensure smooth processing
+      heroImage.style.transform = `scale(${scaleValue}) translateZ(0)`;
 
-      // FIX: Dynamically grow the container's height to exactly fit the scaled image bounding box.
-      // This pushes the rest of the page down naturally, preventing cutoff.
-      if (progress > 0) {
-        const nativeImageHeight = heroImage.getBoundingClientRect().height / scaleValue;
-        const expandedImageHeight = nativeImageHeight * scaleValue;
-        
-        // Ensure container is always at least as tall as the zoomed image + baseline padding 
-        heroSection.style.height = `${Math.max(window.innerHeight, expandedImageHeight + 80)}px`;
-      } else {
-        heroSection.style.height = '100vh';
-      }
-
-      // Fade out arrow prompt
+      // Handle arrow alpha fade
       if (progress > 0.05) {
         scrollArrow.style.opacity = "0";
       } else {
         scrollArrow.style.opacity = "1";
       }
-    });
+
+      ticking = false;
+    }
+
+    window.addEventListener("scroll", () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateZoom);
+        ticking = true;
+      }
+    }, { passive: true });
   </script>
 
   <script>
@@ -347,7 +355,7 @@
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
     function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, m => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[m]));
+      return String(str).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
     }
 
     function renderGuestFields(max) {
