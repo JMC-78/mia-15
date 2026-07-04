@@ -245,9 +245,9 @@
       background: rgba(255,255,255,0.98);
       border: 1px solid #e5e5e5;
       border-radius: 10px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+      box-shadow: 0 166px 40px rgba(0,0,0,0.12);
       max-height: 260px;
-      overflow: auto;
+      overflow-y: auto;
       z-index: 100;
       -webkit-overflow-scrolling: touch;
     }
@@ -459,33 +459,28 @@
       .then(res => res.json())
       .then(data => {
         setStatus("");
-        guestList = data.map(g => ({ name: g.name, max: Number(g.maxGuests) }));
-        data.forEach(g => guestMap.set(g.name.toLowerCase(), Number(g.maxGuests)));
+        // Standardize sheet values right away to prevent string mismatch issues
+        guestList = data.map(g => ({ name: String(g.name).trim(), max: Number(g.maxGuests) }));
+        data.forEach(g => guestMap.set(String(g.name).toLowerCase().trim(), Number(g.maxGuests)));
       })
       .catch(err => {
         console.error(err);
         setStatus("Error loading guest list. Please refresh.");
       });
 
-    nameInput.addEventListener("input", () => {
+    // Handle interactive string sorting
+    function handleAutocompleteUpdates() {
       const q = nameInput.value.toLowerCase().trim();
       if (!q) {
         suggestionsEl.hidden = true;
         return;
       }
-      renderSuggestions(
-        guestList.filter(g => g.name.toLowerCase().includes(q)).slice(0, 8)
-      );
-    });
+      const filtered = guestList.filter(g => g.name.toLowerCase().includes(q));
+      renderSuggestions(filtered);
+    }
 
-    nameInput.addEventListener("focus", () => {
-      const q = nameInput.value.toLowerCase().trim();
-      if (q) {
-        renderSuggestions(
-          guestList.filter(g => g.name.toLowerCase().includes(q)).slice(0, 8)
-        );
-      }
-    });
+    nameInput.addEventListener("input", handleAutocompleteUpdates);
+    nameInput.addEventListener("focus", handleAutocompleteUpdates);
 
     document.addEventListener("click", (e) => {
       if (!nameInput.contains(e.target) && !suggestionsEl.contains(e.target)) {
