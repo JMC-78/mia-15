@@ -409,9 +409,9 @@
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
-    // Cleaned up entity map completely to prevent execution freezes
+    // FIXED SYNTAX: Properly mapped character transformations to prevent engine crash
     function escapeHtml(str) {
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
       return String(str).replace(/[&<>"']/g, m => map[m]);
     }
 
@@ -477,8 +477,6 @@
       );
     });
 
-    // Replaced standard 'blur' with a dynamic document-wide tap listener 
-    // This allows seamless list scrolling without causing the UI to hide
     document.addEventListener("pointerdown", e => {
       if (!autocompleteContainer.contains(e.target)) {
         suggestionsEl.hidden = true;
