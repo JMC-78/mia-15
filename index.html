@@ -411,8 +411,9 @@
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
+    // Fixed internal quote alignment parsing bug here
     function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, m => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[m]));
+      return String(str).replace(/[&<>"']/g, m => ({ "&":"&","<":"<",">":">",'"':"&quot;","'":"&#039;" }[m]));
     }
 
     function renderGuestFields(max) {
