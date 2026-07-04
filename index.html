@@ -409,9 +409,8 @@
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
-    // FIXED SYNTAX: Properly mapped character transformations to prevent engine crash
     function escapeHtml(str) {
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+      const map = { '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' };
       return String(str).replace(/[&<>"']/g, m => map[m]);
     }
 
@@ -441,8 +440,8 @@
           <div class="suggestion-meta">Max ${max}</div>
         `;
         
-        row.addEventListener("pointerdown", e => {
-          e.preventDefault();
+        // FIXED EVENT: Changed from pointerdown to click to allow scrolling over items
+        row.addEventListener("click", () => {
           nameInput.value = name;
           suggestionsEl.hidden = true;
           maxHint.textContent = `Max allowed: ${max}`;
