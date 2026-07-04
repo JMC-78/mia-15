@@ -54,7 +54,8 @@
       justify-content: center;
       align-items: center;
       box-sizing: border-box;
-      padding: 20px;
+      /* Nudged padding slightly upward to clear bottom mobile sheets */
+      padding: 10px 20px 45px 20px;
       z-index: 2;
       background: #ffffff;
       overflow: hidden;
@@ -63,7 +64,8 @@
     /* Immersive Invitation Canvas */
     .hero-image {
       max-width: 100%;
-      max-height: 95vh;
+      /* Scaled down to 82vh to completely clear bottom phone toolbars safely */
+      max-height: 82vh;
       object-fit: contain;
       box-shadow: 0 12px 40px rgba(0,0,0,0.06);
       border-radius: 6px;
@@ -75,11 +77,11 @@
     /* Fancy Floating Scroll Reminder Side-Badge */
     .fancy-reminder {
       position: fixed;
-      bottom: 30px;
-      right: 30px;
+      bottom: 25px;
+      right: 25px;
       z-index: 5;
-      background: rgba(255, 255, 255, 0.85);
-      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.92);
+      padding: 8px 14px;
       border-radius: 30px;
       border: 1px solid rgba(123, 182, 230, 0.3);
       backdrop-filter: blur(8px);
@@ -87,35 +89,53 @@
       box-shadow: 0 8px 24px rgba(123, 182, 230, 0.15);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       pointer-events: none;
       transition: opacity 0.3s ease, transform 0.3s ease;
       animation: gentleFloat 3s ease-in-out infinite;
     }
 
     .fancy-reminder span {
-      font-size: 13px;
+      font-size: 11px;
       color: #5f6f82;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       text-transform: uppercase;
       font-weight: bold;
     }
 
     .fancy-reminder .arrow {
       color: #7bb6e6;
-      font-size: 14px;
+      font-size: 12px;
       display: inline-block;
       animation: pointDown 1.5s ease-in-out infinite;
     }
 
     @keyframes gentleFloat {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
+      50% { transform: translateY(-4px); }
     }
 
     @keyframes pointDown {
-      0%, 100% { transform: translateY(-2px); }
+      0%, 100% { transform: translateY(-1px); }
       50% { transform: translateY(2px); }
+    }
+
+    /* Responsive overrides for smaller phone viewports */
+    @media (max-width: 480px) {
+      .hero-section {
+        padding-bottom: 60px; /* Extra clearance for mobile bottom navigation overlays */
+      }
+      .fancy-reminder {
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        animation: gentleFloatMobile 3s ease-in-out infinite;
+      }
+    }
+
+    @keyframes gentleFloatMobile {
+      0%, 100% { transform: translateX(50%) translateY(0); }
+      50% { transform: translateX(50%) translateY(-4px); }
     }
 
     /* RSVP Section Container sits on top and moves over the fixed hero cleanly */
@@ -345,10 +365,19 @@
       // Fades the reminder badge out smoothly as the user starts making deep progress down the page
       if (progress > 0.4) {
         scrollReminder.style.opacity = "0";
-        scrollReminder.style.transform = "translateY(10px)";
+        // Handles proper cross-device fallback positioning animation dynamically
+        if (window.innerWidth <= 480) {
+          scrollReminder.style.transform = "translateX(50%) translateY(10px)";
+        } else {
+          scrollReminder.style.transform = "translateY(10px)";
+        }
       } else {
         scrollReminder.style.opacity = "1";
-        scrollReminder.style.transform = "translateY(0)";
+        if (window.innerWidth <= 480) {
+          scrollReminder.style.transform = "translateX(50%) translateY(0)";
+        } else {
+          scrollReminder.style.transform = "translateY(0)";
+        }
       }
 
       ticking = false;
