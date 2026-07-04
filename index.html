@@ -413,7 +413,7 @@
 
     // Fixed internal quote alignment parsing bug here
     function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, m => ({ "&":"&","<":"<",">":">",'"':"&quot;","'":"&#039;" }[m]));
+      return String(str).replace(/[&<>"']/g, m => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[m]));
     }
 
     function renderGuestFields(max) {
@@ -479,8 +479,11 @@
       );
     });
 
-    nameInput.addEventListener("blur", () => {
-      setTimeout(() => { suggestionsEl.hidden = true; }, 200);
+    // REPLACED OLD BLUR EVENT: Listens globally to close dropdown safely when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!nameInput.contains(e.target) && !suggestionsEl.contains(e.target)) {
+        suggestionsEl.hidden = true;
+      }
     });
 
     document.getElementById("rsvpForm").addEventListener("submit", e => {
