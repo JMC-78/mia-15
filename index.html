@@ -327,7 +327,7 @@
       <p>Please respond by <strong> Sunday, July 26th</strong></p>
 
       <form id="rsvpForm">
-        <div class="autocomplete">
+        <div class="autocomplete" id="autocompleteContainer">
           <input
             id="nameInput"
             name="name"
@@ -402,18 +402,17 @@
     const guestFieldsEl = document.getElementById("guestFields");
     const guestNamesHidden = document.getElementById("guestNamesHidden");
     const statusEl = document.getElementById("status");
+    const autocompleteContainer = document.getElementById("autocompleteContainer");
 
     const guestMap = new Map();
     let guestList = [];
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
-    // FIXED SYNTAX ERROR HERE (Cleaned up replacement map brackets and quotes)
+    // Cleaned up entity map completely to prevent execution freezes
     function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, m => {
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return map[m];
-      });
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(str).replace(/[&<>"']/g, m => map[m]);
     }
 
     function renderGuestFields(max) {
@@ -478,8 +477,12 @@
       );
     });
 
-    nameInput.addEventListener("blur", () => {
-      setTimeout(() => { suggestionsEl.hidden = true; }, 200);
+    // Replaced standard 'blur' with a dynamic document-wide tap listener 
+    // This allows seamless list scrolling without causing the UI to hide
+    document.addEventListener("pointerdown", e => {
+      if (!autocompleteContainer.contains(e.target)) {
+        suggestionsEl.hidden = true;
+      }
     });
 
     document.getElementById("rsvpForm").addEventListener("submit", e => {
