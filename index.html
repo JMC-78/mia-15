@@ -35,14 +35,20 @@
       overflow-x: hidden;
     }
 
-    /* Fixed track height prevents layout shifting vibration */
+    /* Track shares the global immersive background to fill initial spaces */
     .scroll-track {
       position: relative;
       height: 250vh; 
-      background: #ffffff;
+      background:
+        linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.75)),
+        url('https://wallpapers.com/images/hd/quinceanera-background-l0wmycdz116qhiks.jpg');
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
     }
 
-    /* Hero view container pins perfectly without sticky jitter */
+    /* Hero view container pins perfectly with transparent background to let the artwork shine through */
     .hero-section {
       position: fixed;
       top: 0;
@@ -56,7 +62,7 @@
       box-sizing: border-box;
       padding: 10px 20px 45px 20px;
       z-index: 2;
-      background: #ffffff;
+      background: transparent;
       overflow: hidden;
     }
 
@@ -65,7 +71,7 @@
       max-width: 100%;
       max-height: 82vh;
       object-fit: contain;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
       border-radius: 6px;
       transform-origin: center center;
       will-change: transform;
@@ -303,12 +309,10 @@
 <body>
   <div id="sparkles"></div>
 
-  <!-- Smooth Non-shifting Scroll Track -->
   <div class="scroll-track">
     <div class="hero-section" id="heroSection">
       <img id="heroImage" class="hero-image" src="https://lh3.googleusercontent.com/d/12GORHXtWUM79iIqx1wS8gQU2lj7OdG2X" alt="Mia's Quinceañera Invitation">
       
-      <!-- Safe, corner-anchored subtle reminder -->
       <div class="fancy-reminder" id="scrollReminder">
         <span>Keep Scrolling for RSVP</span>
         <div class="arrow">▼</div>
@@ -316,7 +320,6 @@
     </div>
   </div>
 
-  <!-- RSVP Form Section -->
   <div class="rsvp-container" id="rsvp">
     <div class="card">
       <h1>Mia's Quinceañera RSVP</h1>
@@ -347,7 +350,6 @@
     </div>
   </div>
 
-  <!-- Zero-Jitter Zoom Engine + Dynamic Opacity Controller -->
   <script>
     const heroImage = document.getElementById("heroImage");
     const scrollReminder = document.getElementById("scrollReminder");
@@ -408,9 +410,8 @@
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
-    // Fixed Escape Syntax to Restore Complete Dropdown Functionality
     function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+      return String(str).replace(/[&<>"']/g, m => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[m]));
     }
 
     function renderGuestFields(max) {
