@@ -411,7 +411,6 @@
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
-    // Fixed internal quote alignment parsing bug here
     function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, m => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[m]));
     }
@@ -479,7 +478,15 @@
       );
     });
 
-    // REPLACED OLD BLUR EVENT: Listens globally to close dropdown safely when clicking outside
+    nameInput.addEventListener("focus", () => {
+      const q = nameInput.value.toLowerCase().trim();
+      if (q) {
+        renderSuggestions(
+          guestList.filter(g => g.name.toLowerCase().includes(q)).slice(0, 8)
+        );
+      }
+    });
+
     document.addEventListener("click", (e) => {
       if (!nameInput.contains(e.target) && !suggestionsEl.contains(e.target)) {
         suggestionsEl.hidden = true;
