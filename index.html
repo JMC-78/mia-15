@@ -409,8 +409,9 @@
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
+    // FIXED: Clean character maps with exact HTML entity codes to ensure no execution crashes
     function escapeHtml(str) {
-      const map = { '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' };
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
       return String(str).replace(/[&<>"']/g, m => map[m]);
     }
 
@@ -423,6 +424,13 @@
         if (i === 1) input.required = true;
         guestFieldsEl.appendChild(input);
       }
+    }
+
+    function handleSelection(name, max) {
+      nameInput.value = name;
+      suggestionsEl.hidden = true;
+      maxHint.textContent = `Max allowed: ${max}`;
+      renderGuestFields(max);
     }
 
     function renderSuggestions(items) {
@@ -440,13 +448,16 @@
           <div class="suggestion-meta">Max ${max}</div>
         `;
         
-        // FIXED EVENT: Changed from pointerdown to click to allow scrolling over items
-        row.addEventListener("click", () => {
-          nameInput.value = name;
-          suggestionsEl.hidden = true;
-          maxHint.textContent = `Max allowed: ${max}`;
-          renderGuestFields(max);
+        // Multi-event handlers ensure it clicks flawlessly on standard desktop and touchscreen layouts
+        row.addEventListener("click", () => handleSelection(name, max));
+        row.addEventListener("touchend", (e) => {
+          // Only trigger if the user tapped quickly, not if they were scrolling dragging their finger
+          if (!window.isScrollingDropdown) {
+            e.preventDefault();
+            handleSelection(name, max);
+          }
         });
+
         suggestionsEl.appendChild(row);
       });
       suggestionsEl.hidden = false;
@@ -476,7 +487,13 @@
       );
     });
 
-    document.addEventListener("pointerdown", e => {
+    // Detect if a gesture inside the suggestion panel is a scroll versus a clean selection click
+    window.isScrollingDropdown = false;
+    suggestionsEl.addEventListener("touchmove", () => { window.isScrollingDropdown = true; });
+    suggestionsEl.addEventListener("touchstart", () => { window.isScrollingDropdown = false; });
+
+    // Hides dropdown list if user clicks somewhere outside the container area
+    document.addEventListener("click", e => {
       if (!autocompleteContainer.contains(e.target)) {
         suggestionsEl.hidden = true;
       }
