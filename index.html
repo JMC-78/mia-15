@@ -20,7 +20,8 @@
   <meta name="twitter:description" content="Please respond by Sunday, July 26th to celebrate with us!">
   <meta name="twitter:image" content="https://lh3.googleusercontent.com/d/12GORHXtWUM79iIqx1wS8gQU2lj7OdG2X">
 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght=500&display=swap" rel="stylesheet">
+ <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght=500&display=swap" rel="stylesheet">
+
 </head>
 
   <style>
@@ -212,19 +213,6 @@
       box-shadow: 0 0 0 4px rgba(217, 115, 62, 0.15);
     }
 
-    /* Disabled State styling while loading */
-    input:disabled, button:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-      background-color: #f7ebe1;
-      border-color: rgba(217, 115, 62, 0.15);
-    }
-
-    button:disabled {
-      background: #c9b0a1;
-      box-shadow: none;
-    }
-
     /* Lighter, brighter sunset button layout */
     button {
       background: linear-gradient(135deg, #e68550 0%, #d9733e 100%);
@@ -239,13 +227,13 @@
       box-shadow: 0 6px 20px rgba(217, 115, 62, 0.22);
     }
 
-    button:hover:not(:disabled) {
+    button:hover {
       background: linear-gradient(135deg, #d9733e 0%, #c4602b 100%);
       transform: translateY(-1px);
       box-shadow: 0 8px 24px rgba(217, 115, 62, 0.3);
     }
     
-    button:active:not(:disabled) {
+    button:active {
       transform: translateY(1px);
     }
 
@@ -255,7 +243,6 @@
       color: #a37c65;
       text-align: left;
       padding-left: 4px;
-      transition: color 0.3s ease;
     }
 
     .status {
@@ -387,19 +374,18 @@
             id="nameInput"
             name="name"
             type="text"
-            placeholder="Loading guest list, please wait..."
+            placeholder="Start typing your name"
             autocomplete="off"
             required
-            disabled
           />
           <div id="suggestions" class="suggestions" hidden></div>
-          <div class="hint" id="maxHint" style="color: #d9733e; font-weight: bold;">⏳ Loading guest list... Please wait before typing.</div>
+          <div class="hint" id="maxHint" style="color: #d9733e;">🔍 Connecting to guest list... You can still start typing.</div>
         </div>
 
         <div id="guestFields"></div>
         <input type="hidden" id="guestNamesHidden" name="guestNames">
 
-        <button type="submit" id="submitBtn" disabled>Submit RSVP</button>
+        <button type="submit" id="submitBtn">Submit RSVP</button>
         <div class="status" id="status"></div>
       </form>
 
@@ -462,24 +448,26 @@
 
     const guestMap = new Map();
     let guestList = [];
+    let isLoadedSuccessfully = false;
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
     function escapeHtml(str) {
-      const map = { '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' };
-      return String(str).replace(/[&<>"']/g, m => map[m]);
-    }
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return String(str).replace(/[&<>"']/g, m => map[m]);
+}
 
-    function renderGuestFields(max) {
-      guestFieldsEl.innerHTML = "";
-      for (let i = 1; i <= max; i++) {
-        const input = document.createElement("input");
-        input.className = "guest-field";
-        input.placeholder = `Guest ${i} Full Name`;
-        if (i === 1) input.required = true;
-        guestFieldsEl.appendChild(input);
-      }
-    }
+function renderGuestFields(max) {
+  guestFieldsEl.innerHTML = "";
+  for (let i = 1; i <= max; i++) {
+    const input = document.createElement("input");
+    input.className = "guest-field";
+    input.placeholder = `Guest ${i} Full Name`;
+    if (i === 1) input.required = true;
+    guestFieldsEl.appendChild(input);
+  }
+}
+
 
     function handleSelection(name, max) {
       nameInput.value = name;
@@ -517,37 +505,37 @@
       suggestionsEl.hidden = false;
     }
 
-    // Fetch the data from Google Sheets
+    // Fetch the data from Google Sheets safely
     fetch(scriptURL)
       .then(res => res.json())
       .then(data => {
         guestList = data.map(g => ({ name: g.name, max: Number(g.maxGuests) }));
         data.forEach(g => guestMap.set(g.name.toLowerCase(), Number(g.maxGuests)));
+        isLoadedSuccessfully = true;
         
-        // UNLOCK FORM ONCE FETCHED SUCCESSFULLY
-        nameInput.disabled = false;
-        submitBtn.disabled = false;
-        nameInput.placeholder = "Start typing your name";
-        
-        // Alert the guest visually that the list is active
+        // Notify the guest that connection is solid
         maxHint.style.color = "#27ae60"; 
-        maxHint.innerHTML = "✨ <strong>Ready!</strong> Type your name and select it from the list.";
+        maxHint.innerHTML = "✨ <strong>Connected!</strong> Select your name from the dropdown list.";
         
         setTimeout(() => {
           maxHint.style.color = "#a37c65";
           maxHint.textContent = "Type your name and select it from the list.";
-        }, 3500);
+        }, 4000);
       })
       .catch(err => {
-        console.error(err);
-        maxHint.style.color = "#c0392b";
-        maxHint.innerHTML = "❌ <strong>Error loading guest list.</strong> Please refresh the page.";
-        setStatus("Error loading guest list. Please refresh.");
+        console.error("Database fallback system enabled:", err);
+        // Seamless fallback interface if the fetch connection is broken or taking a long time
+        maxHint.style.color = "#a37c65";
+        maxHint.textContent = "Type your name and fill out your party details below.";
+        
+        if (guestFieldsEl.children.length === 0) {
+          renderGuestFields(2); 
+        }
       });
 
     nameInput.addEventListener("input", () => {
       const q = nameInput.value.toLowerCase().trim();
-      if (!q) {
+      if (!q || !isLoadedSuccessfully) {
         suggestionsEl.hidden = true;
         return;
       }
@@ -570,8 +558,15 @@
       e.preventDefault();
       setStatus("Submitting RSVP...");
       
-      const max = guestMap.get(nameInput.value.toLowerCase().trim());
-      if (!max) return alert("Please select a valid name from the drop down list.");
+      const searchName = nameInput.value.toLowerCase().trim();
+      let max = guestMap.get(searchName);
+
+      if (!isLoadedSuccessfully) {
+        max = guestFieldsEl.querySelectorAll(".guest-field").length || 2;
+      } else if (!max) {
+        setStatus("");
+        return alert("Please select your valid name option from the dropdown menu list.");
+      }
 
       const names = [...guestFieldsEl.querySelectorAll(".guest-field")]
         .map(i => i.value.trim())
@@ -579,7 +574,7 @@
 
       if (!names.length || names.length > max) {
         setStatus("");
-        return alert(`Please enter up to ${max} guest names.`);
+        return alert(`Please fill in your guest options (Up to ${max} slots available).`);
       }
 
       guestNamesHidden.value = names.join("\n");
@@ -588,7 +583,7 @@
         .then(res => res.text())
         .then(msg => {
           setStatus("");
-          alert(msg === "Success" ? "RSVP submitted!" : msg);
+          alert(msg === "Success" ? "RSVP submitted successfully!" : msg);
           if (msg === "Success") {
             document.getElementById("rsvpForm").reset();
             guestFieldsEl.innerHTML = "";
@@ -597,7 +592,7 @@
         })
         .catch(err => {
           console.error(err);
-          setStatus("Submission failed. Try again.");
+          setStatus("Submission failed. Please try again.");
         });
     });
   </script>
@@ -607,7 +602,7 @@
     function createStar() {
       const star = document.createElement("div");
       star.className = "sparkle";
-      const size = Math.random() * 4 + 6; // Decreased max size slightly to keep background elegant
+      const size = Math.random() * 4 + 6;
       star.style.width = `${size}px`;
       star.style.height = `${size}px`;
       star.style.left = Math.random() * 100 + "vw";
@@ -616,7 +611,7 @@
       sparkleContainer.appendChild(star);
       setTimeout(() => { star.remove(); }, 12000);
     }
-    setInterval(createStar, 380); // Marginally slowed down spawn interval to minimize visual clutter
+    setInterval(createStar, 380);
   </script>
 </body>
 </html>
