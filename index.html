@@ -20,334 +20,331 @@
   <meta name="twitter:description" content="Please respond by Sunday, July 26th to celebrate with us!">
   <meta name="twitter:image" content="https://lh3.googleusercontent.com/d/12GORHXtWUM79iIqx1wS8gQU2lj7OdG2X">
 
- <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght=500&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght=500&display=swap" rel="stylesheet">
 </head>
 
-  <style>
-    html {
-      scroll-behavior: smooth;
-    }
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
 
-    body {
-      margin: 0;
-      font-family: 'Playfair Display', serif;
-      background-color: #fff6ed; 
-      overflow-x: hidden;
-    }
+  body {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    background-color: #fff6ed; 
+    overflow-x: hidden;
+  }
 
-    /* Immersive scroll track utilizing warm sunset tones */
-    .scroll-track {
-      position: relative;
-      height: 220vh; 
-      background: linear-gradient(rgba(255, 246, 237, 0.6), rgba(255, 246, 237, 0.85));
-      z-index: 1;
-    }
+  /* Immersive scroll track utilizing warm sunset tones */
+  .scroll-track {
+    position: relative;
+    height: 220vh; 
+    background: linear-gradient(rgba(255, 246, 237, 0.6), rgba(255, 246, 237, 0.85));
+    z-index: 1;
+  }
 
-    /* Fixed view container - High layer priority ensures it stays on top of stars */
+  /* Fixed view container - High layer priority ensures it stays on top of stars */
+  .hero-section {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 10px 20px 45px 20px;
+    z-index: 10; /* Elevated above background elements and star layers */
+    background: transparent;
+    overflow: hidden;
+    pointer-events: none; 
+  }
+
+  /* Invitation image scaling configuration */
+  .hero-image {
+    max-width: 92%; 
+    max-height: 80vh;
+    object-fit: contain;
+    box-shadow: 0 12px 40px rgba(217, 115, 62, 0.12);
+    border-radius: 8px;
+    transform-origin: center center;
+    will-change: transform;
+    transform: scale(1) translateZ(0);
+    pointer-events: auto; 
+  }
+
+  /* Fancy Floating Scroll Reminder Side-Badge */
+  .fancy-reminder {
+    position: fixed;
+    bottom: 30px;
+    right: 25px;
+    z-index: 15;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 16px;
+    border-radius: 30px;
+    border: 1px solid rgba(217, 115, 62, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px rgba(217, 115, 62, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    animation: gentleFloat 3s ease-in-out infinite;
+  }
+
+  .fancy-reminder span {
+    font-size: 11px;
+    color: #8c5535;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  .fancy-reminder .arrow {
+    color: #d9733e;
+    font-size: 12px;
+    display: inline-block;
+    animation: pointDown 1.5s ease-in-out infinite;
+  }
+
+  @keyframes gentleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes pointDown {
+    0%, 100% { transform: translateY(-1px); }
+    50% { transform: translateY(2px); }
+  }
+
+  @media (max-width: 480px) {
     .hero-section {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      box-sizing: border-box;
-      padding: 10px 20px 45px 20px;
-      z-index: 10; /* Elevated above background elements and star layers */
-      background: transparent;
-      overflow: hidden;
-      pointer-events: none; 
+      padding-bottom: 60px;
     }
-
-    /* Invitation image scaling configuration */
-    .hero-image {
-      max-width: 92%; 
-      max-height: 80vh;
-      object-fit: contain;
-      box-shadow: 0 12px 40px rgba(217, 115, 62, 0.12);
-      border-radius: 8px;
-      transform-origin: center center;
-      will-change: transform;
-      transform: scale(1) translateZ(0);
-      pointer-events: auto; 
-    }
-
-    /* Fancy Floating Scroll Reminder Side-Badge */
     .fancy-reminder {
-      position: fixed;
-      bottom: 30px;
-      right: 25px;
-      z-index: 15;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 10px 16px;
-      border-radius: 30px;
-      border: 1px solid rgba(217, 115, 62, 0.25);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      box-shadow: 0 8px 24px rgba(217, 115, 62, 0.1);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      pointer-events: none;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      animation: gentleFloat 3s ease-in-out infinite;
+      bottom: 24px;
+      right: 50%;
+      transform: translateX(50%);
+      animation: gentleFloatMobile 3s ease-in-out infinite;
     }
+  }
 
-    .fancy-reminder span {
-      font-size: 11px;
-      color: #8c5535;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      font-weight: bold;
-    }
+  @keyframes gentleFloatMobile {
+    0%, 100% { transform: translateX(50%) translateY(0); }
+    50% { transform: translateX(50%) translateY(-4px); }
+  }
 
-    .fancy-reminder .arrow {
-      color: #d9733e;
-      font-size: 12px;
-      display: inline-block;
-      animation: pointDown 1.5s ease-in-out infinite;
-    }
+  /* RSVP Container transitioning into the vanilla cream shade with light amber-glow gradient */
+  .rsvp-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 60px 24px;
+    box-sizing: border-box;
+    z-index: 20; 
+    background-color: #fff6ed; 
+    background-image: radial-gradient(circle at center, rgba(217, 115, 62, 0.08) 0%, rgba(255, 246, 237, 0) 70%);
+  }
 
-    @keyframes gentleFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
-    }
+  /* Frosted Glassmorphism RSVP Card style matching lighter sunset accents */
+  .card {
+    background: rgba(255, 255, 255, 0.92);
+    padding: 2.5rem 2rem;
+    border-radius: 24px;
+    max-width: 420px;
+    width: 100%;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(217, 115, 62, 0.18);
+    box-shadow: 0 30px 60px rgba(120, 60, 20, 0.05), 
+                0 12px 24px rgba(217, 115, 62, 0.03);
+    text-align: center;
+  }
 
-    @keyframes pointDown {
-      0%, 100% { transform: translateY(-1px); }
-      50% { transform: translateY(2px); }
-    }
+  h1 {
+    margin-top: 0;
+    margin-bottom: 0.4rem;
+    font-size: 26px;
+    color: #d9733e; 
+    letter-spacing: 0.5px;
+  }
 
-    @media (max-width: 480px) {
-      .hero-section {
-        padding-bottom: 60px;
-      }
-      .fancy-reminder {
-        bottom: 24px;
-        right: 50%;
-        transform: translateX(50%);
-        animation: gentleFloatMobile 3s ease-in-out infinite;
-      }
-    }
+  p {
+    margin-top: 0;
+    margin-bottom: 1.8rem;
+    color: #8c5535;
+    font-size: 16px;
+  }
 
-    @keyframes gentleFloatMobile {
-      0%, 100% { transform: translateX(50%) translateY(0); }
-      50% { transform: translateX(50%) translateY(-4px); }
-    }
+  strong {
+    color: #d9733e;
+    font-weight: 600;
+  }
 
-    /* RSVP Container transitioning into the vanilla cream shade with light amber-glow gradient */
-    .rsvp-container {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 60px 24px;
-      box-sizing: border-box;
-      z-index: 20; 
-      background-color: #fff6ed; 
-      background-image: radial-gradient(circle at center, rgba(217, 115, 62, 0.08) 0%, rgba(255, 246, 237, 0) 70%);
-    }
+  input, button {
+    width: 100%;
+    padding: 14px 16px; 
+    margin-top: 12px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(217, 115, 62, 0.25);
+    box-sizing: border-box;
+    background-color: #ffffff;
+    font-family: inherit;
+    color: #5e3b25;
+    transition: all 0.2s ease;
+  }
 
-    /* Frosted Glassmorphism RSVP Card style matching lighter sunset accents */
-    .card {
-      background: rgba(255, 255, 255, 0.92);
-      padding: 2.5rem 2rem;
-      border-radius: 24px;
-      max-width: 420px;
-      width: 100%;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(217, 115, 62, 0.18);
-      box-shadow: 0 30px 60px rgba(120, 60, 20, 0.05), 
-                  0 12px 24px rgba(217, 115, 62, 0.03);
-      text-align: center;
-    }
+  input::placeholder {
+    color: #c9b0a1;
+  }
 
-    h1 {
-      margin-top: 0;
-      margin-bottom: 0.4rem;
-      font-size: 26px;
-      color: #d9733e; 
-      letter-spacing: 0.5px;
-    }
+  /* Focus state with lighter glow */
+  input:focus {
+    outline: none;
+    border-color: #d9733e;
+    box-shadow: 0 0 0 4px rgba(217, 115, 62, 0.15);
+  }
 
-    p {
-      margin-top: 0;
-      margin-bottom: 1.8rem;
-      color: #8c5535;
-      font-size: 16px;
-    }
+  /* Lighter, brighter sunset button layout */
+  button {
+    background: linear-gradient(135deg, #e68550 0%, #d9733e 100%);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    margin-top: 24px;
+    font-weight: bold;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-size: 14px;
+    box-shadow: 0 6px 20px rgba(217, 115, 62, 0.22);
+  }
 
-    strong {
-      color: #d9733e;
-      font-weight: 600;
-    }
+  button:hover {
+    background: linear-gradient(135deg, #d9733e 0%, #c4602b 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(217, 115, 62, 0.3);
+  }
+  
+  button:active {
+    transform: translateY(1px);
+  }
 
-    input, button {
-      width: 100%;
-      padding: 14px 16px; 
-      margin-top: 12px;
-      font-size: 16px;
-      border-radius: 12px;
-      border: 1px solid rgba(217, 115, 62, 0.25);
-      box-sizing: border-box;
-      background-color: #ffffff;
-      font-family: inherit;
-      color: #5e3b25;
-      transition: all 0.2s ease;
-    }
+  .hint {
+    font-size: 13px;
+    margin-top: 8px;
+    color: #a37c65;
+    text-align: left;
+    padding-left: 4px;
+  }
 
-    input::placeholder {
-      color: #c9b0a1;
-    }
+  .status {
+    margin-top: 16px;
+    font-size: 15px;
+    color: #d9733e;
+    font-weight: bold;
+    min-height: 20px;
+  }
 
-    /* Focus state with lighter glow */
-    input:focus {
-      outline: none;
-      border-color: #d9733e;
-      box-shadow: 0 0 0 4px rgba(217, 115, 62, 0.15);
-    }
+  .deadline {
+    font-size: 14px;
+    margin-top: 20px;
+    color: #a37c65;
+    border-top: 1px solid rgba(217, 115, 62, 0.1);
+    padding-top: 16px;
+  }
 
-    /* Lighter, brighter sunset button layout */
-    button {
-      background: linear-gradient(135deg, #e68550 0%, #d9733e 100%);
-      color: #ffffff;
-      border: none;
-      cursor: pointer;
-      margin-top: 24px;
-      font-weight: bold;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      font-size: 14px;
-      box-shadow: 0 6px 20px rgba(217, 115, 62, 0.22);
-    }
+  /* Autocomplete Dropdown Styling */
+  .autocomplete {
+    position: relative;
+    width: 100%;
+  }
 
-    button:hover {
-      background: linear-gradient(135deg, #d9733e 0%, #c4602b 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(217, 115, 62, 0.3);
-    }
-    
-    button:active {
-      transform: translateY(1px);
-    }
+  .suggestions {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid rgba(217, 115, 62, 0.25);
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(120, 60, 20, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    -webkit-overflow-scrolling: touch;
+  }
 
-    .hint {
-      font-size: 13px;
-      margin-top: 8px;
-      color: #a37c65;
-      text-align: left;
-      padding-left: 4px;
-    }
+  .suggestion-item {
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    border-bottom: 1px solid #fff6ed;
+    text-align: left;
+  }
 
-    .status {
-      margin-top: 16px;
-      font-size: 15px;
-      color: #d9733e;
-      font-weight: bold;
-      min-height: 20px;
-    }
+  .suggestion-item:last-child {
+    border-bottom: none;
+  }
 
-    .deadline {
-      font-size: 14px;
-      margin-top: 20px;
-      color: #a37c65;
-      border-top: 1px solid rgba(217, 115, 62, 0.1);
-      padding-top: 16px;
-    }
+  .suggestion-item:hover {
+    background: #fff6ed;
+  }
 
-    /* Autocomplete Dropdown Styling */
-    .autocomplete {
-      position: relative;
-      width: 100%;
-    }
+  .suggestion-name {
+    font-size: 16px;
+    color: #5e3b25;
+  }
 
-    .suggestions {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      right: 0;
-      background: #ffffff;
-      border: 1px solid rgba(217, 115, 62, 0.25);
-      border-radius: 12px;
-      box-shadow: 0 16px 40px rgba(120, 60, 20, 0.1);
-      max-height: 200px;
-      overflow-y: auto;
-      z-index: 100;
-      -webkit-overflow-scrolling: touch;
-    }
+  .suggestion-meta {
+    font-size: 14px;
+    color: #d9733e;
+    font-weight: bold;
+  }
 
-    .suggestion-item {
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      cursor: pointer;
-      border-bottom: 1px solid #fff6ed;
-      text-align: left;
-    }
+  .guest-field {
+    width: 100%;
+    padding: 14px 16px;
+    margin-top: 12px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(217, 115, 62, 0.25);
+  }
+  
+  /* CRITICAL FIX: Sparkle wrapper nested directly below the image layer structure */
+  #sparkles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh; /* Keeps stars rendering strictly on the top half screen */
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 2; /* Lower than hero-section (10), hidden cleanly behind invitation */
+  }
 
-    .suggestion-item:last-child {
-      border-bottom: none;
-    }
+  /* Elegant Golden Yellow Stars matched to invitation graphics */
+  .sparkle {
+    position: absolute;
+    top: -20px;
+    width: 14px;
+    height: 14px;
+    background: #f1c40f;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
+    animation: fall linear infinite, twinkle ease-in-out infinite;
+  }
 
-    .suggestion-item:hover {
-      background: #fff6ed;
-    }
-
-    .suggestion-name {
-      font-size: 16px;
-      color: #5e3b25;
-    }
-
-    .suggestion-meta {
-      font-size: 14px;
-      color: #d9733e;
-      font-weight: bold;
-    }
-
-    .guest-field {
-      width: 100%;
-      padding: 14px 16px;
-      margin-top: 12px;
-      font-size: 16px;
-      border-radius: 12px;
-      border: 1px solid rgba(217, 115, 62, 0.25);
-    }
-    
-    /* CRITICAL FIX: Sparkle wrapper nested directly below the image layer structure */
-    #sparkles {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh; /* Keeps stars rendering strictly on the top half screen */
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 2; /* Lower than hero-section (10), hidden cleanly behind invitation */
-    }
-
-    /* Elegant Golden Yellow Stars matched to invitation graphics */
-    .sparkle {
-      position: absolute;
-      top: -20px;
-      width: 14px;
-      height: 14px;
-      background: #f1c40f;
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-      box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
-      animation: fall linear infinite, twinkle ease-in-out infinite;
-    }
-
-    @keyframes fall { to { transform: translateY(105vh) rotate(360deg); opacity: 0; } }
-    @keyframes twinkle { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-  </style>
-</head>
-
+  @keyframes fall { to { transform: translateY(105vh) rotate(360deg); opacity: 0; } }
+  @keyframes twinkle { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+</style>
 <body>
 
   <div class="scroll-track">
@@ -453,21 +450,20 @@
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
     function escapeHtml(str) {
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-  return String(str).replace(/[&<>"']/g, m => map[m]);
-}
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(str).replace(/[&<>"']/g, m => map[m]);
+    }
 
-function renderGuestFields(max) {
-  guestFieldsEl.innerHTML = "";
-  for (let i = 1; i <= max; i++) {
-    const input = document.createElement("input");
-    input.className = "guest-field";
-    input.placeholder = `Guest ${i} Full Name`;
-    if (i === 1) input.required = true;
-    guestFieldsEl.appendChild(input);
-  }
-}
-
+    function renderGuestFields(max) {
+      guestFieldsEl.innerHTML = "";
+      for (let i = 1; i <= max; i++) {
+        const input = document.createElement("input");
+        input.className = "guest-field";
+        input.placeholder = `Guest ${i} Full Name`;
+        if (i === 1) input.required = true;
+        guestFieldsEl.appendChild(input);
+      }
+    }
 
     function handleSelection(name, max) {
       nameInput.value = name;
@@ -524,7 +520,6 @@ function renderGuestFields(max) {
       })
       .catch(err => {
         console.error("Database fallback system enabled:", err);
-        // Seamless fallback interface if the fetch connection is broken or taking a long time
         maxHint.style.color = "#a37c65";
         maxHint.textContent = "Type your name and fill out your party details below.";
         
@@ -558,14 +553,26 @@ function renderGuestFields(max) {
       e.preventDefault();
       setStatus("Submitting RSVP...");
       
-      const searchName = nameInput.value.toLowerCase().trim();
+      // Collapses extra hidden accidental double spaces
+      const searchName = nameInput.value.replace(/\s+/g, ' ').trim().toLowerCase();
       let max = guestMap.get(searchName);
 
       if (!isLoadedSuccessfully) {
         max = guestFieldsEl.querySelectorAll(".guest-field").length || 2;
       } else if (!max) {
         setStatus("");
-        return alert("Please select your valid name option from the dropdown menu list.");
+        // Fuzzy backup matching loop
+        for (let [key, value] of guestMap.entries()) {
+          if (key.includes(searchName) || searchName.includes(key)) {
+            max = value;
+            break;
+          }
+        }
+        
+        // Final smart failover override block if user input still doesn't register perfectly matches
+        if (!max) {
+          max = guestFieldsEl.querySelectorAll(".guest-field").length || 5;
+        }
       }
 
       const names = [...guestFieldsEl.querySelectorAll(".guest-field")]
