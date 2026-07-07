@@ -379,6 +379,7 @@
           <div class="hint" id="maxHint" style="color: #d9733e;">🔍 Connecting to guest list... You can still start typing.</div>
         </div>
 
+        <!-- Dynamic professional reassurance banner container -->
         <div id="guestMessage" style="font-size: 14px; color: #8c5535; margin: 16px 0 4px 0; font-weight: 500; text-align: left; line-height: 1.4;"></div>
         
         <div id="guestFields"></div>
@@ -452,6 +453,7 @@
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
+    // Escapes special characters properly inside dynamic strings
     function escapeHtml(str) {
       const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
       return String(str).replace(/[&<>"']/g, m => map[m]);
@@ -474,16 +476,17 @@
       maxHint.style.color = "#8c5535";
       maxHint.textContent = `Max allowed: ${max}`;
       
-      // Update dynamic generalized verification statement
-      if (max === 1) {
+      // Update dynamic confirmation messages based on guest count variations
+      if (max === 0) {
+        guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed! Ready to submit your attendance below.`;
+        guestFieldsEl.innerHTML = ""; // No extra fields generated for solo guests
+      } else if (max === 1) {
         guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed! Please specify the name of your +1 below:`;
-      } else if (max > 1) {
-        guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed! Please specify the names of your ${max} guests below:`;
+        renderGuestFields(max);
       } else {
-        guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed!`;
+        guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed! Please specify the names of your ${max} guests below:`;
+        renderGuestFields(max);
       }
-
-      renderGuestFields(max);
     }
 
     function renderSuggestions(items) {
@@ -565,15 +568,14 @@
       e.preventDefault();
       setStatus("Submitting RSVP...");
       
-      // Auto collapses double spaces or structural anomalies out of manually typed text entry strings
       const searchName = nameInput.value.replace(/\s+/g, ' ').trim().toLowerCase();
       let max = guestMap.get(searchName);
 
       if (!isLoadedSuccessfully) {
         max = guestFieldsEl.querySelectorAll(".guest-field").length || 2;
-      } else if (!max) {
+      } else if (max === undefined) {
         setStatus("");
-        // Fuzzy entry layout tracking match check
+        // Fuzzy backup matching check logic
         for (let [key, value] of guestMap.entries()) {
           if (key.includes(searchName) || searchName.includes(key)) {
             max = value;
@@ -581,7 +583,7 @@
           }
         }
         
-        if (!max) {
+        if (max === undefined) {
           max = guestFieldsEl.querySelectorAll(".guest-field").length || 5;
         }
       }
@@ -590,11 +592,13 @@
         .map(i => i.value.trim())
         .filter(Boolean);
 
-      if (!names.length || names.length > max) {
+      // EXCEPTION CONTROL: Only throw an alert error block if they have a non-zero max guest allocation restriction
+      if (max > 0 && (!names.length || names.length > max)) {
         setStatus("");
         return alert(`Please fill in your guest options (Up to ${max} slots available).`);
       }
 
+      // Joins entries or sends blank text data strings comfortably for solo visitors
       guestNamesHidden.value = names.join("\n");
 
       fetch(scriptURL, { method: "POST", body: new FormData(e.target) })
@@ -605,7 +609,7 @@
           if (msg === "Success") {
             document.getElementById("rsvpForm").reset();
             guestFieldsEl.innerHTML = "";
-            guestMessageEl.innerHTML = ""; // Clean out the reassurance text banner layout explicitly on reset
+            guestMessageEl.innerHTML = ""; 
             maxHint.textContent = "Type your name and select it from the list.";
           }
         })
