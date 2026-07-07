@@ -379,6 +379,8 @@
           <div class="hint" id="maxHint" style="color: #d9733e;">🔍 Connecting to guest list... You can still start typing.</div>
         </div>
 
+        <div id="guestMessage" style="font-size: 14px; color: #8c5535; margin: 16px 0 4px 0; font-weight: 500; text-align: left; line-height: 1.4;"></div>
+        
         <div id="guestFields"></div>
         <input type="hidden" id="guestNamesHidden" name="guestNames">
 
@@ -442,6 +444,7 @@
     const guestNamesHidden = document.getElementById("guestNamesHidden");
     const statusEl = document.getElementById("status");
     const autocompleteContainer = document.getElementById("autocompleteContainer");
+    const guestMessageEl = document.getElementById("guestMessage");
 
     const guestMap = new Map();
     let guestList = [];
@@ -470,6 +473,16 @@
       suggestionsEl.hidden = true;
       maxHint.style.color = "#8c5535";
       maxHint.textContent = `Max allowed: ${max}`;
+      
+      // Update dynamic generalized verification statement
+      if (max === 1) {
+        guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed! Please specify the name of your +1 below:`;
+      } else if (max > 1) {
+        guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed! Please specify the names of your ${max} guests below:`;
+      } else {
+        guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed!`;
+      }
+
       renderGuestFields(max);
     }
 
@@ -509,7 +522,6 @@
         data.forEach(g => guestMap.set(g.name.toLowerCase(), Number(g.maxGuests)));
         isLoadedSuccessfully = true;
         
-        // Notify the guest that connection is solid
         maxHint.style.color = "#27ae60"; 
         maxHint.innerHTML = "✨ <strong>Connected!</strong> Select your name from the dropdown list.";
         
@@ -553,7 +565,7 @@
       e.preventDefault();
       setStatus("Submitting RSVP...");
       
-      // Collapses extra hidden accidental double spaces
+      // Auto collapses double spaces or structural anomalies out of manually typed text entry strings
       const searchName = nameInput.value.replace(/\s+/g, ' ').trim().toLowerCase();
       let max = guestMap.get(searchName);
 
@@ -561,7 +573,7 @@
         max = guestFieldsEl.querySelectorAll(".guest-field").length || 2;
       } else if (!max) {
         setStatus("");
-        // Fuzzy backup matching loop
+        // Fuzzy entry layout tracking match check
         for (let [key, value] of guestMap.entries()) {
           if (key.includes(searchName) || searchName.includes(key)) {
             max = value;
@@ -569,7 +581,6 @@
           }
         }
         
-        // Final smart failover override block if user input still doesn't register perfectly matches
         if (!max) {
           max = guestFieldsEl.querySelectorAll(".guest-field").length || 5;
         }
@@ -594,6 +605,7 @@
           if (msg === "Success") {
             document.getElementById("rsvpForm").reset();
             guestFieldsEl.innerHTML = "";
+            guestMessageEl.innerHTML = ""; // Clean out the reassurance text banner layout explicitly on reset
             maxHint.textContent = "Type your name and select it from the list.";
           }
         })
