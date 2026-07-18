@@ -236,6 +236,23 @@
     transform: translateY(1px);
   }
 
+  /* Subdued secondary theme style for decline button */
+  .btn-decline {
+    background: transparent;
+    color: #a37c65;
+    border: 1px solid rgba(217, 115, 62, 0.3);
+    margin-top: 12px;
+    box-shadow: none;
+  }
+
+  .btn-decline:hover {
+    background: rgba(217, 115, 62, 0.05);
+    color: #8c5535;
+    border-color: #d9733e;
+    box-shadow: none;
+    transform: translateY(-1px);
+  }
+
   .hint {
     font-size: 13px;
     margin-top: 8px;
@@ -324,10 +341,10 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh; /* Keeps stars rendering strictly on the top half screen */
+    height: 100vh;
     pointer-events: none;
     overflow: hidden;
-    z-index: 2; /* Lower than hero-section (10), hidden cleanly behind invitation */
+    z-index: 2;
   }
 
   /* Elegant Golden Yellow Stars matched to invitation graphics */
@@ -386,6 +403,8 @@
         <input type="hidden" id="guestNamesHidden" name="guestNames">
 
         <button type="submit" id="submitBtn">Submit RSVP</button>
+        <button type="button" id="declineBtn" class="btn-decline">Unable to attend</button>
+        
         <div class="status" id="status"></div>
       </form>
 
@@ -435,10 +454,11 @@
   </script>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwt_c66RgBCddKq_B3nZpOoNLs5YYHb4RJsGTxPmbksuqb8GnoOd9abrfA-QaaDafyz/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwUfDke5G01oT4V88XA0YYEZota7uRnHfEU0v46dsSaKSgqusxh8AEwqjq18ezOO3F8/exec";
 
     const nameInput = document.getElementById("nameInput");
     const submitBtn = document.getElementById("submitBtn");
+    const declineBtn = document.getElementById("declineBtn");
     const suggestionsEl = document.getElementById("suggestions");
     const maxHint = document.getElementById("maxHint");
     const guestFieldsEl = document.getElementById("guestFields");
@@ -453,9 +473,8 @@
 
     function setStatus(msg) { statusEl.textContent = msg || ""; }
 
-    // Escapes special characters properly inside dynamic strings
     function escapeHtml(str) {
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
       return String(str).replace(/[&<>"']/g, m => map[m]);
     }
 
@@ -476,10 +495,9 @@
       maxHint.style.color = "#8c5535";
       maxHint.textContent = `Max allowed: ${max}`;
       
-      // Update dynamic confirmation messages based on guest count variations
       if (max === 0) {
         guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed! Ready to submit your attendance below.`;
-        guestFieldsEl.innerHTML = ""; // No extra fields generated for solo guests
+        guestFieldsEl.innerHTML = ""; 
       } else if (max === 1) {
         guestMessageEl.innerHTML = `✨ <strong>${escapeHtml(name)}</strong>, your reservation is confirmed! Please specify the name of your +1 below:`;
         renderGuestFields(max);
@@ -517,7 +535,6 @@
       suggestionsEl.hidden = false;
     }
 
-    // Fetch the data from Google Sheets safely
     fetch(scriptURL)
       .then(res => res.json())
       .then(data => {
@@ -564,6 +581,15 @@
       }
     });
 
+    // Helper to process form clearing on successful response
+    function resetFormState() {
+      document.getElementById("rsvpForm").reset();
+      guestFieldsEl.innerHTML = "";
+      guestMessageEl.innerHTML = ""; 
+      maxHint.textContent = "Type your name and select it from the list.";
+    }
+
+    // Handles the primary submission (Attending)
     document.getElementById("rsvpForm").addEventListener("submit", e => {
       e.preventDefault();
       setStatus("Submitting RSVP...");
@@ -575,30 +601,24 @@
         max = guestFieldsEl.querySelectorAll(".guest-field").length || 2;
       } else if (max === undefined) {
         setStatus("");
-        // Fuzzy backup matching check logic
         for (let [key, value] of guestMap.entries()) {
           if (key.includes(searchName) || searchName.includes(key)) {
             max = value;
             break;
           }
         }
-        
-        if (max === undefined) {
-          max = guestFieldsEl.querySelectorAll(".guest-field").length || 5;
-        }
+        if (max === undefined) max = guestFieldsEl.querySelectorAll(".guest-field").length || 5;
       }
 
       const names = [...guestFieldsEl.querySelectorAll(".guest-field")]
         .map(i => i.value.trim())
         .filter(Boolean);
 
-      // EXCEPTION CONTROL: Only throw an alert error block if they have a non-zero max guest allocation restriction
       if (max > 0 && (!names.length || names.length > max)) {
         setStatus("");
         return alert(`Please fill in your guest options (Up to ${max} slots available).`);
       }
 
-      // Joins entries or sends blank text data strings comfortably for solo visitors
       guestNamesHidden.value = names.join("\n");
 
       fetch(scriptURL, { method: "POST", body: new FormData(e.target) })
@@ -606,17 +626,41 @@
         .then(msg => {
           setStatus("");
           alert(msg === "Success" ? "RSVP submitted successfully!" : msg);
-          if (msg === "Success") {
-            document.getElementById("rsvpForm").reset();
-            guestFieldsEl.innerHTML = "";
-            guestMessageEl.innerHTML = ""; 
-            maxHint.textContent = "Type your name and select it from the list.";
-          }
+          if (msg === "Success") resetFormState();
         })
         .catch(err => {
           console.error(err);
           setStatus("Submission failed. Please try again.");
         });
+    });
+
+    // Handles the decline logic flow completely
+    declineBtn.addEventListener("click", () => {
+      const checkName = nameInput.value.replace(/\s+/g, ' ').trim();
+      if (!checkName) {
+        return alert("Please enter or select your name first so we know who to update on the guest list.");
+      }
+
+      if (confirm(`Confirm submission: Invitatiom declined for "${checkName}"?`)) {
+        setStatus("Submitting cancellation response...");
+        
+        // Pass a structural flag directly to your Google Sheets row parser
+        guestNamesHidden.value = "Declined / Not Attending";
+
+        const formData = new FormData(document.getElementById("rsvpForm"));
+
+        fetch(scriptURL, { method: "POST", body: formData })
+          .then(res => res.text())
+          .then(msg => {
+            setStatus("");
+            alert(msg === "Success" ? "Your response has been saved. Thank you!" : msg);
+            if (msg === "Success") resetFormState();
+          })
+          .catch(err => {
+            console.error(err);
+            setStatus("Submission failed. Please try again.");
+          });
+      }
     });
   </script>
 
