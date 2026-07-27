@@ -479,15 +479,18 @@
     }
 
     function renderGuestFields(max) {
-      guestFieldsEl.innerHTML = "";
-      for (let i = 1; i <= max; i++) {
-        const input = document.createElement("input");
-        input.className = "guest-field";
-        input.placeholder = `Guest ${i} Full Name`;
-        if (i === 1) input.required = true;
-        guestFieldsEl.appendChild(input);
-      }
-    }
+  guestFieldsEl.innerHTML = "";
+  for (let i = 1; i <= max; i++) {
+    const input = document.createElement("input");
+    input.className = "guest-field";
+    input.placeholder = `Guest ${i} Full Name (Optional)`;
+    
+    // Explicitly disable HTML browser validation on guest inputs
+    input.required = false; 
+    
+    guestFieldsEl.appendChild(input);
+  }
+}
 
     function handleSelection(name, max) {
       nameInput.value = name;
