@@ -589,7 +589,7 @@
       maxHint.textContent = "Type your name and select it from the list.";
     }
 
-    // Handles the primary submission (Attending)
+// Updated Flexible Submit Event Listener
     document.getElementById("rsvpForm").addEventListener("submit", e => {
       e.preventDefault();
       setStatus("Submitting RSVP...");
@@ -610,16 +610,19 @@
         if (max === undefined) max = guestFieldsEl.querySelectorAll(".guest-field").length || 5;
       }
 
+      // Collect any filled-in guest names (ignoring empty fields)
       const names = [...guestFieldsEl.querySelectorAll(".guest-field")]
         .map(i => i.value.trim())
         .filter(Boolean);
 
-      if (max > 0 && (!names.length || names.length > max)) {
+      // PREVENT ONLY IF they try to submit MORE than their allowed maximum
+      if (names.length > max) {
         setStatus("");
-        return alert(`Please fill in your guest options (Up to ${max} slots available).`);
+        return alert(`You can bring a maximum of ${max} extra guest(s). Please remove extra names.`);
       }
 
-      guestNamesHidden.value = names.join("\n");
+      // Send filled names or default to "Attending Solo"
+      guestNamesHidden.value = names.length > 0 ? names.join("\n") : "Attending Solo";
 
       fetch(scriptURL, { method: "POST", body: new FormData(e.target) })
         .then(res => res.text())
@@ -633,7 +636,7 @@
           setStatus("Submission failed. Please try again.");
         });
     });
-
+    
     // Handles the decline logic flow completely
     declineBtn.addEventListener("click", () => {
       const checkName = nameInput.value.replace(/\s+/g, ' ').trim();
